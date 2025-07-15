@@ -13,7 +13,7 @@ jobs:
           mkdir -p /home/runner/.ssh
 
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/runner/.ssh/id_ed25519
-          chmod 600 /home/runner/.ssh/id_ed5519
+          chmod 600 /home/runner/.ssh/id_ed25519
 
           eval $(ssh-agent -s)
           ssh-add /home/runner/.ssh/id_ed25519
