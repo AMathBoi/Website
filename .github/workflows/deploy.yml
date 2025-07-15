@@ -19,6 +19,7 @@ jobs:
 
           ssh-keyscan github.com >> /home/runner/.ssh/known_hosts
 
+          echo "SSH Command: ssh -o StrictHostKeyChecking=no -i /home/runner/.ssh/id_ed25519 ${USER}@$SSH_HOST '/home/${USER}/scripts/deploy.sh'"
           ssh -o StrictHostKeyChecking=no -i /home/runner/.ssh/id_ed25519 ${USER}@$SSH_HOST "/home/${USER}/scripts/deploy.sh"
         env:
           SSH_AUTH_SOCK: /tmp/ssh_auth_sock
