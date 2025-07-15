@@ -10,7 +10,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > key && chmod 600 key
-          ssh -o StrictHostKeyChecking=no $USER@$SSH_HOST "bash -s" < ~/scripts/deploy.sh key
+          mkdir -p /home/runner/.ssh
+
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/runner/.ssh/id_ed25519
+          chmod 600 /home/runner/.ssh/id_ed5519
+
+          eval $(ssh-agent -s)
+          ssh-add /home/runner/.ssh/id_ed25519
+
+          ssh-keyscan github.com >> /home/runner/.ssh/known_hosts
+
+          ssh -o StrictHostKeyChecking=no $USER@$SSH_HOST "/home/$USER/scripts/deploy.sh"
         env:
           SSH_AUTH_SOCK: /tmp/ssh_auth_sock
+
