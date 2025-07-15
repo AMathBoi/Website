@@ -10,21 +10,21 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-            mkdir -p /home/runner/.ssh
+          mkdir -p /home/runner/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/runner/.ssh/id_ed25519
+          chmod 600 /home/runner/.ssh/id_ed25519
 
-            echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/runner/.ssh/id_ed25519
-            chmod 600 /home/runner/.ssh/id_ed25519
+          eval $(ssh-agent -s)
+          ssh-add /home/runner/.ssh/id_ed25519 <<< "${{ secrets.SSH_PASSPHRASE }}"
 
-            eval $(ssh-agent -s)
-            ssh-add /home/runner/.ssh/id_ed25519 <<< "${{ secrets.SSH_PASSPHRASE }}"
+          ssh-keyscan github.com >> /home/runner/.ssh/known_hosts
 
-            ssh-keyscan github.com >> /home/runner/.ssh/known_hosts
+          # Debug: Print SSH_HOST value
+          echo "Attempting to connect to: $SSH_HOST"
+          ping -c 4 $SSH_HOST  # Test connectivity with 4 pings
 
-            # Debug: Print SSH_HOST value
-            echo "Attempting to connect to: $SSH_HOST"
-            ping -c 4 $SSH_HOST  # Test connectivity with 4 pings
-
-            ssh -o StrictHostKeyChecking=no ${USER}@$SSH_HOST "/home/${USER}/scripts/deploy.sh"
+          # Attempt SSH connection
+          ssh -o StrictHostKeyChecking=no ${USER}@$SSH_HOST "/home/${USER}/scripts/deploy.sh"
         env:
           SSH_AUTH_SOCK: /tmp/ssh_auth_sock
           SSH_HOST: "${{ secrets.SSH_HOST }}"
