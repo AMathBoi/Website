@@ -11,6 +11,6 @@ jobs:
       - uses: actions/checkout@v2
       - run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > key && chmod 600 key
-          ssh -o StrictHostKeyChecking=no $USER@$SSH_HOST "bash -s" < deploy.sh key
+          ssh -o StrictHostKeyChecking=no $USER@$SSH_HOST "bash -s" < ~/scripts/deploy.sh key
         env:
           SSH_AUTH_SOCK: /tmp/ssh_auth_sock
