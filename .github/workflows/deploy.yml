@@ -19,10 +19,25 @@ jobs:
 
           ssh-keyscan github.com >> /home/runner/.ssh/known_hosts
 
-          echo "SSH Command: ssh -o StrictHostKeyChecking=no -i /home/runner/.ssh/id_ed25519 ${USER}@$SSH_HOST '/home/${USER}/scripts/deploy.sh'"
-          ssh -o StrictHostKeyChecking=no -i /home/runner/.ssh/id_ed25519 ${USER}@$SSH_HOST "/home/${USER}/scripts/deploy.sh"
+          # Debug: Print SSH_HOST and attempt to resolve it
+          echo "Attempting to connect to: $SSH_HOST"
+          if ping -c 4 $SSH_HOST; then
+            echo "$SSH_HOST is reachable."
+          else
+            echo "Error: $SSH_HOST is not reachable. Please check the hostname or IP address and ensure it's accessible from GitHub Actions runners."
+            exit 1
+          fi
+
+          # Attempt SSH connection with timeout
+          if ssh -o StrictHostKeyChecking=no -i /home/runner/.ssh/id_ed25519 ${USER}@$SSH_HOST "/home/${USER}/scripts/deploy.sh" -o ConnectTimeout=10; then
+            echo "SSH connection and deployment were successful."
+          else
+            echo "Error: SSH connection or deployment failed. Please check your remote server's SSH service, firewall rules, and security groups."
+            exit 1
+          fi
         env:
           SSH_AUTH_SOCK: /tmp/ssh_auth_sock
           SSH_HOST: "${{ secrets.SSH_HOST }}"
           USER: "${{ secrets.USER }}"
+
 
