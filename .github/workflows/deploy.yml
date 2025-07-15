@@ -16,7 +16,7 @@ jobs:
           chmod 600 /home/runner/.ssh/id_ed25519
 
           eval $(ssh-agent -s)
-          ssh-add /home/runner/.ssh/id_ed25519
+          ssh-add /home/runner/.ssh/id_ed25519 <<< "${{ secrets.SSH_PASSPHRASE }}"
 
           ssh-keyscan github.com >> /home/runner/.ssh/known_hosts
 
