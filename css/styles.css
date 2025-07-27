@@ -30,21 +30,59 @@ body {
     cursor: pointer;
 }
 
-.menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background-color: #fff;
-    padding-top: 20px;
-    padding-left: 20px;
-    padding-bottom: 0;
-    padding-right: 20px;
-    border: 1px solid #ddd;
-    display: none;
-    white-space: nowrap;
-}
 
+/* Sliding menu styles */
+.menu {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+    transition: right 0.3s cubic-bezier(.4,0,.2,1);
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    padding-top: 60px;
+}
 .menu.active {
+    right: 0;
+}
+.menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.menu ul li {
+    margin: 20px 0;
+    text-align: left;
+    padding-left: 30px;
+}
+.menu ul li a {
+    color: #222;
+    text-decoration: none;
+    font-size: 1.2em;
+}
+.menu a:hover {
+    color: #666;
+}
+.menu-icon {
+    cursor: pointer;
+    z-index: 1100;
+    position: relative;
+}
+.menu-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.3);
+    z-index: 1000;
+}
+.menu.active ~ .menu-backdrop {
     display: block;
 }
 

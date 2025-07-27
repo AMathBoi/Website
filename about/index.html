@@ -8,50 +8,76 @@
 </head>
 <body>
     <main>
+        <p>About me</p>
         <!-- About me content goes here -->
     </main>
     <footer>
+        <div id="bottom-bar" style="background:#fff; color:#222; padding:12px 0; text-align:center; border-top:1.5px solid #ccc; margin-top:0;">
+            <a href="https://github.com/" target="_blank" style="color:#222; margin:0 16px; text-decoration:none; font-weight:bold;">GitHub</a>
         <!-- Footer content goes here -->
     </footer>
     <script>
     function loadTopBar() {
-        const topBar = document.createElement('div');
-        topBar.innerHTML = `
-            <div class="top-bar">
-                <div class="logo">
-                    <a href="/index.html">
-                        <img src="/img/logo.png" alt="Logo">
-                    </a>
-                </div>
-                <div class="menu-icon">
-                    <img src="/img/menu-icon.png" alt="Menu Icon">
-                    <div class="menu">
-                        <ul>
-                            <li><a href="/about/index.html">About Me</a></li>
-                            <li><a href="/guides/index.html">Guides</a></li>
-                            <!-- Add more links as needed -->
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        `;
-        document.body.insertBefore(topBar, document.body.firstChild);
+    fetch('/etc/top-bar.html')
+        .then(response => response.text())
+        .then(html => {
+            const topBar = document.createElement('div');
+            topBar.innerHTML = html;
+            document.body.insertBefore(topBar, document.body.firstChild);
 
-        const menuIcon = document.querySelector('.menu-icon img');
-const menu = document.querySelector('.menu');
+            const menuIcon = topBar.querySelector('.menu-icon img');
+            const menu = topBar.querySelector('.menu');
 
-menuIcon.addEventListener('click', () => {
-    menu.classList.toggle('active');
-});
+            if (menuIcon && menu) {
+                menuIcon.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent document click from firing
+                    menu.classList.toggle('active');
+                });
 
-document.addEventListener('click', (e) => {
-    if (!menu.contains(e.target) && !menuIcon.contains(e.target)) {
-        menu.classList.remove('active');
-    }
-});
+                // Prevent clicks inside the menu from closing it
+                menu.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+
+                // Clicking outside the menu (on the document, but not on the menu or menu icon) closes the menu
+                document.addEventListener('click', function(e) {
+                    if (menu.classList.contains('active')) {
+                        // If click is outside menu and menu icon
+                        if (!menu.contains(e.target) && !menuIcon.contains(e.target)) {
+                            menu.classList.remove('active');
+                        }
+                    }
+                });
+
+                // Pressing Escape closes the menu
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && menu.classList.contains('active')) {
+                        menu.classList.remove('active');
+                    }
+                });
+            }
+        });
+}
+
+    function handleBottomBar() {
+        const bottomBar = document.getElementById('bottom-bar');
+        function checkScroll() {
+            const scrollY = window.scrollY || window.pageYOffset;
+            const windowHeight = window.innerHeight;
+            const bodyHeight = document.body.offsetHeight;
+            if (scrollY + windowHeight >= bodyHeight - 2) {
+                bottomBar.classList.add('active');
+            } else {
+                bottomBar.classList.remove('active');
+            }
+        }
+        window.addEventListener('scroll', checkScroll);
+        window.addEventListener('resize', checkScroll);
+        checkScroll();
     }
 
     loadTopBar();
+    handleBottomBar();
 </script>
 </body>
 </html>
