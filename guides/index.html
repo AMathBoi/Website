@@ -8,8 +8,10 @@
 </head>
 <body>
     <main>
-        <p>Guides</p>
-        <!-- Guides content goes here -->
+        <h1>Guides</h1>
+        <input id="guide-search" type="text" placeholder="Search guides..." style="width:100%;max-width:400px;padding:8px;margin-bottom:1em;box-sizing:border-box;" />
+        <div id="tag-filters" style="margin-bottom: 1em;"></div>
+        <div id="guides-list"></div>
     </main>
     <footer>
         <div id="bottom-bar" style="background:#fff; color:#222; padding:12px 0; text-align:center; border-top:1.5px solid #ccc; margin-top:0;">
@@ -18,46 +20,39 @@
     </footer>
     <script>
     function loadTopBar() {
-    fetch('/etc/top-bar.html')
-        .then(response => response.text())
-        .then(html => {
-            const topBar = document.createElement('div');
-            topBar.innerHTML = html;
-            document.body.insertBefore(topBar, document.body.firstChild);
+        fetch('/etc/top-bar.html')
+            .then(response => response.text())
+            .then(html => {
+                const topBar = document.createElement('div');
+                topBar.innerHTML = html;
+                document.body.insertBefore(topBar, document.body.firstChild);
 
-            const menuIcon = topBar.querySelector('.menu-icon img');
-            const menu = topBar.querySelector('.menu');
+                const menuIcon = topBar.querySelector('.menu-icon img');
+                const menu = topBar.querySelector('.menu');
 
-            if (menuIcon && menu) {
-                menuIcon.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent document click from firing
-                    menu.classList.toggle('active');
-                });
-
-                // Prevent clicks inside the menu from closing it
-                menu.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                });
-
-                // Clicking outside the menu (on the document, but not on the menu or menu icon) closes the menu
-                document.addEventListener('click', function(e) {
-                    if (menu.classList.contains('active')) {
-                        // If click is outside menu and menu icon
-                        if (!menu.contains(e.target) && !menuIcon.contains(e.target)) {
+                if (menuIcon && menu) {
+                    menuIcon.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        menu.classList.toggle('active');
+                    });
+                    menu.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                    });
+                    document.addEventListener('click', function(e) {
+                        if (menu.classList.contains('active')) {
+                            if (!menu.contains(e.target) && !menuIcon.contains(e.target)) {
+                                menu.classList.remove('active');
+                            }
+                        }
+                    });
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape' && menu.classList.contains('active')) {
                             menu.classList.remove('active');
                         }
-                    }
-                });
-
-                // Pressing Escape closes the menu
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape' && menu.classList.contains('active')) {
-                        menu.classList.remove('active');
-                    }
-                });
-            }
-        });
-}
+                    });
+                }
+            });
+    }
 
     function handleBottomBar() {
         const bottomBar = document.getElementById('bottom-bar');
@@ -76,8 +71,77 @@
         checkScroll();
     }
 
+    // --- Guides UI ---
+    async function loadGuides() {
+        const guidesList = document.getElementById('guides-list');
+        const tagFilters = document.getElementById('tag-filters');
+        const searchInput = document.getElementById('guide-search');
+        let guides = [];
+        let allTags = new Set();
+        try {
+            const res = await fetch('guides.json');
+            guides = await res.json();
+            guides.forEach(g => g.tags.forEach(tag => allTags.add(tag)));
+        } catch (e) {
+            guidesList.innerHTML = '<p>Could not load guides.</p>';
+            return;
+        }
+
+        // Tag filter UI
+        tagFilters.innerHTML = '';
+        allTags = Array.from(allTags).sort();
+        allTags.forEach(tag => {
+            const label = document.createElement('label');
+            label.style.marginRight = '1em';
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = tag;
+            cb.addEventListener('change', updateList);
+            label.appendChild(cb);
+            label.appendChild(document.createTextNode(' ' + tag));
+            tagFilters.appendChild(label);
+        });
+
+        searchInput.addEventListener('input', updateList);
+
+        function updateList() {
+            const checked = Array.from(tagFilters.querySelectorAll('input:checked')).map(cb => cb.value);
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            let filtered = guides;
+            if (checked.length > 0) {
+                filtered = filtered.filter(g => checked.every(tag => g.tags.includes(tag)));
+            }
+            if (searchTerm.length > 0) {
+                filtered = filtered.filter(g =>
+                    g.title.toLowerCase().includes(searchTerm) ||
+                    g.summary.toLowerCase().includes(searchTerm)
+                );
+            }
+            renderGuides(filtered);
+        }
+
+        function renderGuides(list) {
+            if (list.length === 0) {
+                guidesList.innerHTML = '<p>No guides found for selected tags or search.</p>';
+                return;
+            }
+            guidesList.innerHTML = '';
+            list.forEach(g => {
+                const div = document.createElement('div');
+                div.className = 'guide-card';
+                div.style = 'border:1px solid #ccc; border-radius:8px; padding:1em; margin-bottom:1em; background:#fafbfc;';
+                div.innerHTML = `<h2 style=\"margin-top:0;\"><a href=\"${g.filename}\" style=\"text-decoration:none; color:#222;\">${g.title}</a></h2><p>${g.summary}</p><div style=\"margin-top:0.5em;\">${g.tags.map(t => `<span style='display:inline-block; background:#eee; color:#333; border-radius:4px; padding:2px 8px; margin-right:4px; font-size:0.9em;'>${t}</span>`).join('')}</div>`;
+                guidesList.appendChild(div);
+            });
+        }
+
+        // Initial render
+        renderGuides(guides);
+    }
+
     loadTopBar();
     handleBottomBar();
-</script>
+    loadGuides();
+    </script>
 </body>
 </html>
