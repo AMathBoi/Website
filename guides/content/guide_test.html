@@ -78,6 +78,25 @@
         checkScroll();
     }
 
+    function showLoginIndicator() {
+        const bottomBar = document.getElementById('bottom-bar');
+        if (localStorage.getItem('isLoggedIn') === 'true' && bottomBar) {
+            let indicator = document.getElementById('login-indicator');
+            if (!indicator) {
+                indicator = document.createElement('span');
+                indicator.id = 'login-indicator';
+                indicator.textContent = 'Logged in';
+                indicator.style.cssText = 'color:#090; margin-left:18px; font-weight:bold; font-size:1em;';
+                bottomBar.appendChild(indicator);
+            }
+        } else {
+            const indicator = document.getElementById('login-indicator');
+            if (indicator) indicator.remove();
+        }
+    }
+    showLoginIndicator();
+    window.addEventListener('storage', showLoginIndicator);
+
     loadTopBar();
     handleBottomBar();
 </script>

@@ -14,9 +14,11 @@
         <div id="guides-list"></div>
     </main>
     <footer>
-        <div id="bottom-bar" style="background:#fff; color:#222; padding:12px 0; text-align:center; border-top:1.5px solid #ccc; margin-top:0;">
-            <a href="https://github.com/" target="_blank" style="color:#222; margin:0 16px; text-decoration:none; font-weight:bold;">GitHub</a>
         <!-- Footer content goes here -->
+        <div id="bottom-bar" style="background:#fff; color:#222; padding:12px 0; text-align:center; border-top:1.5px solid #ccc; margin-top:0;">
+            <a href="https://github.com/AMathBoi" target="_blank" style="color:#222; margin:0 16px; text-decoration:none; font-weight:bold;"><img src="/img/github-icon.png" alt="GitHub Icon" style="width:16px; height:16px; vertical-align:auto;"> GitHub</a>
+            <!-- Add more platform links here -->
+        </div>
     </footer>
     <script>
     function loadTopBar() {
@@ -138,6 +140,25 @@
         // Initial render
         renderGuides(guides);
     }
+
+    function showLoginIndicator() {
+        const bottomBar = document.getElementById('bottom-bar');
+        if (localStorage.getItem('isLoggedIn') === 'true' && bottomBar) {
+            let indicator = document.getElementById('login-indicator');
+            if (!indicator) {
+                indicator = document.createElement('span');
+                indicator.id = 'login-indicator';
+                indicator.textContent = 'Logged in';
+                indicator.style.cssText = 'color:#090; margin-left:18px; font-weight:bold; font-size:1em;';
+                bottomBar.appendChild(indicator);
+            }
+        } else {
+            const indicator = document.getElementById('login-indicator');
+            if (indicator) indicator.remove();
+        }
+    }
+    showLoginIndicator();
+    window.addEventListener('storage', showLoginIndicator);
 
     loadTopBar();
     handleBottomBar();

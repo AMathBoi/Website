@@ -97,11 +97,11 @@
             if (indicator) indicator.remove();
         }
     }
+    showLoginIndicator();
+    window.addEventListener('storage', showLoginIndicator);
 
     loadTopBar();
     handleBottomBar();
-    showLoginIndicator();
-    window.addEventListener('storage', showLoginIndicator);
 </script>
 </body>
 </html>
