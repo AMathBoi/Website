@@ -21,47 +21,47 @@
     </footer>
 <script>
     function loadTopBar() {
-    fetch('/etc/top-bar.html')
-        .then(response => response.text())
-        .then(html => {
-            const topBar = document.createElement('div');
-            topBar.innerHTML = html;
-            document.body.insertBefore(topBar, document.body.firstChild);
+        fetch('/etc/top-bar.html')
+            .then(response => response.text())
+            .then(html => {
+                const topBar = document.createElement('div');
+                topBar.innerHTML = html;
+                document.body.insertBefore(topBar, document.body.firstChild);
 
-            const menuIcon = topBar.querySelector('.menu-icon img');
-            const menu = topBar.querySelector('.menu');
+                const menuIcon = topBar.querySelector('.menu-icon img');
+                const menu = topBar.querySelector('.menu');
 
-            if (menuIcon && menu) {
-                menuIcon.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent document click from firing
-                    menu.classList.toggle('active');
-                });
+                if (menuIcon && menu) {
+                    menuIcon.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent document click from firing
+                        menu.classList.toggle('active');
+                    });
 
-                // Prevent clicks inside the menu from closing it
-                //test
-                menu.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                });
+                    // Prevent clicks inside the menu from closing it
+                    //test
+                    menu.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                    });
 
-                // Clicking outside the menu (on the document, but not on the menu or menu icon) closes the menu
-                document.addEventListener('click', function(e) {
-                    if (menu.classList.contains('active')) {
-                        // If click is outside menu and menu icon
-                        if (!menu.contains(e.target) && !menuIcon.contains(e.target)) {
+                    // Clicking outside the menu (on the document, but not on the menu or menu icon) closes the menu
+                    document.addEventListener('click', function(e) {
+                        if (menu.classList.contains('active')) {
+                            // If click is outside menu and menu icon
+                            if (!menu.contains(e.target) && !menuIcon.contains(e.target)) {
+                                menu.classList.remove('active');
+                            }
+                        }
+                    });
+
+                    // Pressing Escape closes the menu
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape' && menu.classList.contains('active')) {
                             menu.classList.remove('active');
                         }
-                    }
-                });
-
-                // Pressing Escape closes the menu
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape' && menu.classList.contains('active')) {
-                        menu.classList.remove('active');
-                    }
-                });
-            }
-        });
-}
+                    });
+                }
+            });
+    }
 
     function handleBottomBar() {
         const bottomBar = document.getElementById('bottom-bar');
@@ -80,8 +80,28 @@
         checkScroll();
     }
 
+    // Add login indicator if logged in
+    function showLoginIndicator() {
+        const bottomBar = document.getElementById('bottom-bar');
+        if (localStorage.getItem('isLoggedIn') === 'true' && bottomBar) {
+            let indicator = document.getElementById('login-indicator');
+            if (!indicator) {
+                indicator = document.createElement('span');
+                indicator.id = 'login-indicator';
+                indicator.textContent = 'Logged in';
+                indicator.style.cssText = 'color:#090; margin-left:18px; font-weight:bold; font-size:1em;';
+                bottomBar.appendChild(indicator);
+            }
+        } else {
+            const indicator = document.getElementById('login-indicator');
+            if (indicator) indicator.remove();
+        }
+    }
+
     loadTopBar();
     handleBottomBar();
+    showLoginIndicator();
+    window.addEventListener('storage', showLoginIndicator);
 </script>
 </body>
 </html>

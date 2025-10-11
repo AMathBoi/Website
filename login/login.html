@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Login - Gavin Woods</title>
+	<link rel="stylesheet" href="/css/styles.css">
+	<style>
+		.login-container {
+			max-width: 400px;
+			margin: 60px auto 0 auto;
+			background: #fff;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+			padding: 2rem 2.5rem 2.5rem 2.5rem;
+		}
+		.login-container h2 {
+			text-align: center;
+			margin-bottom: 1.5rem;
+			color: #222;
+		}
+		.login-form label {
+			display: block;
+			margin-bottom: 0.5rem;
+			color: #222;
+			font-weight: 500;
+		}
+		.login-form input[type="text"],
+		.login-form input[type="password"] {
+			width: 100%;
+			padding: 0.7rem;
+			margin-bottom: 1.2rem;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			font-size: 1em;
+		}
+		.login-form button {
+			width: 100%;
+			padding: 0.8rem;
+			background: #222;
+			color: #fff;
+			border: none;
+			border-radius: 4px;
+			font-size: 1.1em;
+			font-weight: bold;
+			cursor: pointer;
+			transition: background 0.2s;
+		}
+		.login-form button:hover {
+			background: #444;
+		}
+		.login-form .form-footer {
+			text-align: center;
+			margin-top: 1.2rem;
+		}
+		.login-form .form-footer a {
+			color: #222;
+			text-decoration: underline;
+			font-size: 0.98em;
+		}
+		@media (max-width: 500px) {
+			.login-container {
+				padding: 1.2rem 0.7rem 1.5rem 0.7rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<div class="login-container">
+			<h2>Login</h2>
+			<form class="login-form" id="loginForm" autocomplete="off">
+				<label for="username">Username</label>
+				<input type="text" id="username" name="username" required autofocus>
+
+				<label for="password">Password</label>
+				<input type="password" id="password" name="password" required>
+
+				<button type="submit">Log In</button>
+				<div id="login-error" style="color:#c00; text-align:center; margin-top:1em; display:none;"></div>
+			</form>
+		</div>
+	</main>
+	<footer>
+		<div id="bottom-bar" style="background:#fff; color:#222; padding:12px 0; text-align:center; border-top:1.5px solid #ccc; margin-top:0;">
+			<a href="https://github.com/AMathBoi" target="_blank" style="color:#222; margin:0 16px; text-decoration:none; font-weight:bold;"><img src="/img/github-icon.png" alt="GitHub Icon" style="width:16px; height:16px; vertical-align:auto;"> GitHub</a>
+		</div>
+	</footer>
+	<script>
+		function loadTopBar() {
+			fetch('/etc/top-bar.html')
+				.then(response => response.text())
+				.then(html => {
+					const topBar = document.createElement('div');
+					topBar.innerHTML = html;
+					document.body.insertBefore(topBar, document.body.firstChild);
+
+					const menuIcon = topBar.querySelector('.menu-icon img');
+					const menu = topBar.querySelector('.menu');
+
+					if (menuIcon && menu) {
+						menuIcon.addEventListener('click', (e) => {
+							e.stopPropagation();
+							menu.classList.toggle('active');
+						});
+						menu.addEventListener('click', (e) => {
+							e.stopPropagation();
+						});
+						document.addEventListener('click', function(e) {
+							if (menu.classList.contains('active')) {
+								if (!menu.contains(e.target) && !menuIcon.contains(e.target)) {
+									menu.classList.remove('active');
+								}
+							}
+						});
+						document.addEventListener('keydown', (e) => {
+							if (e.key === 'Escape' && menu.classList.contains('active')) {
+								menu.classList.remove('active');
+							}
+						});
+					}
+				});
+		}
+		function handleBottomBar() {
+			const bottomBar = document.getElementById('bottom-bar');
+			function checkScroll() {
+				const scrollY = window.scrollY || window.pageYOffset;
+				const windowHeight = window.innerHeight;
+				const bodyHeight = document.body.offsetHeight;
+				if (scrollY + windowHeight >= bodyHeight - 2) {
+					bottomBar.classList.add('active');
+				} else {
+					bottomBar.classList.remove('active');
+				}
+			}
+			window.addEventListener('scroll', checkScroll);
+			window.addEventListener('resize', checkScroll);
+			checkScroll();
+		}
+		// Login form handler
+		document.addEventListener('DOMContentLoaded', function() {
+			const form = document.getElementById('loginForm');
+			const errorDiv = document.getElementById('login-error');
+			if (form) {
+				form.addEventListener('submit', function(e) {
+					e.preventDefault();
+					errorDiv.style.display = 'none';
+					const username = form.username.value;
+					const password = form.password.value;
+					fetch('/api/login', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ username, password })
+					})
+					.then(res => {
+						if (res.ok) return res.json();
+						throw new Error('Login failed');
+					})
+					.then(data => {
+						// Set login indicator in localStorage
+						localStorage.setItem('isLoggedIn', 'true');
+						window.location.href = '/index.html';
+					})
+					.catch(() => {
+						errorDiv.textContent = 'Login failed. Please check your username and password.';
+						errorDiv.style.display = 'block';
+						localStorage.removeItem('isLoggedIn');
+					});
+				});
+			}
+		});
+		loadTopBar();
+		handleBottomBar();
+	</script>
+</body>
+</html>
