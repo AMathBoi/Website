@@ -31,7 +31,7 @@ body {
 }
 
 
-/* Sliding menu styles */
+/* Sliding menu styles for top bar*/
 .menu {
     position: fixed;
     top: 0;
@@ -45,6 +45,7 @@ body {
     display: flex;
     flex-direction: column;
     padding-top: 60px;
+    justify-content: space-between;
 }
 .menu.active {
     right: 0;
@@ -115,10 +116,10 @@ main {
 .login-link-menu {
     display: flex;
     justify-content: flex-start;
-    align-items: flex-end;
-    height: 40px;
+    align-items: center;
     margin-left: 30px;
-    margin-top: 10px;
+    margin-bottom: 75px;
+    margin-top: 0;
 }
 .login-link-menu a {
     background: #222;

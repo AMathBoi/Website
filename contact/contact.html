@@ -7,15 +7,85 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css?family=Noto+Sans:400,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://www.google.com/recaptcha/api.js?render=6LeA0OcrAAAAAKtP4cj47vM0j9XchzG_bfIuXoLa"></script>
 </head>
 <body>
     <main>
-    <h1>This website is under development!</h1>
-    <p>Come back later for updates. :)</p>
-    <p>In the meantime, you can check out the <a href="guides/index.html">guides</a> section for some content.</p>
-</main>
+        <div class="contact-container">
+            <h2>Contact Me</h2>
+            <form class="contact-form" id="contactForm" autocomplete="off">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="5" required style="width:100%;padding:0.7rem;margin-bottom:1.2rem;border:1px solid #ccc;border-radius:4px;font-size:1em;"></textarea>
+                
+                
+  <input type="hidden" name="recaptcha_token" id="recaptchaToken" />
+
+
+                <button type="submit">Send Message</button>
+                <div id="contact-success" style="color:#090; text-align:center; margin-top:1em; display:none;"></div>
+                <div id="contact-error" style="color:#c00; text-align:center; margin-top:1em; display:none;"></div>
+            </form>
+        </div>
+    </main>
     <footer>
+<style>
+    .contact-container {
+        max-width: 500px;
+        margin: 60px auto 0 auto;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        padding: 2rem 2.5rem 2.5rem 2.5rem;
+    }
+    .contact-container h2 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: #222;
+    }
+    .contact-form label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #222;
+        font-weight: 500;
+    }
+    .contact-form input[type="text"],
+    .contact-form input[type="email"] {
+        width: 100%;
+        padding: 0.7rem;
+        margin-bottom: 1.2rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1em;
+    }
+    .contact-form button[type="submit"] {
+        width: 100%;
+        padding: 0.8rem;
+        background: #222;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .contact-form button[type="submit"]:hover {
+        background: #444;
+    }
+    @media (max-width: 500px) {
+        .contact-container {
+            padding: 1.2rem 0.7rem 1.5rem 0.7rem;
+        }
+    }
+</style>
         <!-- Footer content goes here -->
         <div id="bottom-bar" style="background:#fff; color:#222; padding:12px 0; text-align:center; border-top:1.5px solid #ccc; margin-top:0;">
             <a href="https://github.com/AMathBoi" target="_blank" style="color:#222; margin:0 16px; text-decoration:none; font-weight:bold;"><img src="/img/github-icon.png" alt="GitHub Icon" style="width:16px; height:16px; vertical-align:auto;"> GitHub</a>
@@ -106,6 +176,54 @@
 
     loadTopBar();
     handleBottomBar();
+
+    // Contact form handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('contactForm');
+        const successDiv = document.getElementById('contact-success');
+        const errorDiv = document.getElementById('contact-error');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                successDiv.style.display = 'none';
+                errorDiv.style.display = 'none';
+                // Simulate sending (replace with real API call if needed)
+                setTimeout(() => {
+                    successDiv.textContent = 'Thank you for contacting us!';
+                    successDiv.style.display = 'block';
+                    form.reset();
+                }, 700);
+            });
+        }
+    });
 </script>
+<script>
+function onClick(e) {
+  e.preventDefault();
+  grecaptcha.enterprise.ready(async () => {
+    const token = await grecaptcha.enterprise.execute('6LeA0OcrAAAAAKtP4cj47vM0j9XchzG_bfIuXoLa', {action: 'LOGIN'});
+    // IMPORTANT: The 'token' that results from execute is an encrypted response sent by
+    // reCAPTCHA to the end user's browser.
+    // This token must be validated by creating an assessment.
+    // See https://cloud.google.com/recaptcha/docs/create-assessment
+  });
+}
+</script>
+<script>
+    const form = document.getElementById('loginForm');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault(); // prevent immediate submit
+
+      grecaptcha.ready(function () {
+        grecaptcha.execute('6LeA0OcrAAAAAKtP4cj47vM0j9XchzG_bfIuXoLa', { action: 'login' }).then(function (token) {
+          // Put token in hidden field and submit form
+          document.getElementById('recaptchaToken').value = token;
+          form.submit(); // now submit
+        });
+      });
+    });
+  </script>
+
 </body>
 </html>
