@@ -8,12 +8,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css?family=Noto+Sans:400,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
-    <script src="https://www.google.com/recaptcha/api.js?render=6LeA0OcrAAAAAKtP4cj47vM0j9XchzG_bfIuXoLa"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
     <main>
         <div class="contact-container">
-            <h2>Contact Me</h2>
+            <h2>Contact Me (not functional)</h2>
             <form class="contact-form" id="contactForm" autocomplete="off">
                 <label for="name">Name</label>
                 <input type="text" id="name" name="name" required>
@@ -25,13 +25,10 @@
                 <textarea id="message" name="message" rows="5" required style="width:100%;padding:0.7rem;margin-bottom:1.2rem;border:1px solid #ccc;border-radius:4px;font-size:1em;"></textarea>
                 
                 
-  <input type="hidden" name="recaptcha_token" id="recaptchaToken" />
+  
 
-
-                <button type="submit" class="g-recaptcha"
-    data-sitekey="6LeA0OcrAAAAAKtP4cj47vM0j9XchzG_bfIuXoLa"
-    data-callback='onSubmit'
-    data-action='submit'>Send Message</button>
+<div class="cf-turnstile" data-sitekey="0x4AAAAAAB6aCdEv50HIORgH"></div>
+                <button type="submit">Send Message</button>
                 <div id="contact-success" style="color:#090; text-align:center; margin-top:1em; display:none;"></div>
                 <div id="contact-error" style="color:#c00; text-align:center; margin-top:1em; display:none;"></div>
             </form>
@@ -200,73 +197,5 @@
         }
     });
 </script>
-<script>
-function onClick(e) {
-  e.preventDefault();
-  grecaptcha.enterprise.ready(async () => {
-    const token = await grecaptcha.enterprise.execute('6LeA0OcrAAAAAKtP4cj47vM0j9XchzG_bfIuXoLa', {action: 'LOGIN'});
-    // IMPORTANT: The 'token' that results from execute is an encrypted response sent by
-    // reCAPTCHA to the end user's browser.
-    // This token must be validated by creating an assessment.
-    // See https://cloud.google.com/recaptcha/docs/create-assessment
-  });
-}
-</script>
-<script>
-    const form = document.getElementById('loginForm');
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault(); // prevent immediate submit
-
-      grecaptcha.ready(function () {
-        grecaptcha.execute('6LeA0OcrAAAAAKtP4cj47vM0j9XchzG_bfIuXoLa', { action: 'login' }).then(function (token) {
-          // Put token in hidden field and submit form
-          document.getElementById('recaptchaToken').value = token;
-          form.submit(); // now submit
-        });
-      });
-    });
-  </script>
-<script>
-    const siteKey = "6LeA0OcrAAAAAKtP4cj47vM0j9XchzG_bfIuXoLa"; 
-
-    document.getElementById('login-form').addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      // Request the token from reCAPTCHA
-      grecaptcha.ready(() => {
-        grecaptcha.execute(siteKey, { action: 'login' })
-          .then(token => {
-            // set the hidden field with the token
-            document.getElementById('recaptchaToken').value = token;
-
-            // Now submit the form data (username, password, recaptchaToken) via fetch/Ajax
-            const formData = new FormData(e.target);
-            const obj = {};
-            formData.forEach((v, k) => { obj[k] = v; });
-
-            fetch('/api/login', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(obj)
-            })
-            .then(res => res.json())
-            .then(data => {
-              console.log('Login response:', data);
-              if (data.success) {
-                // redirect or show success
-              } else {
-                alert('Login failed: ' + (data.message || 'Unknown error'));
-              }
-            })
-            .catch(err => {
-              console.error('Login error:', err);
-            });
-          });
-      });
-    });
-  </script>
 </body>
 </html>
